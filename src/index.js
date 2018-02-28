@@ -1,70 +1,74 @@
 module.exports = function getZerosCount(number, base) {
-    var x = base;
-    var result = 0,p = [];
-    var i = 2, j = 1;
-    var a = new Array();
-    do{
-        if (x % i == 0){
-            a[j] = i;
+    var maxPower = 1;
+    var maxPower1 = 1;
+    var copeOfBase = base;
+    var result = 0;
+    var i = 2,
+        j = 0;
+    var decomposition = [];
+    do {
+        if (copeOfBase % i == 0) {
+            decomposition.push(i);
             j++;
-            x = x / i;
-        }else{
+            copeOfBase = copeOfBase / i;
+        } else {
             i++;
         }
     }
-    while (i < x);
-    a[j] = i;
-    
-    nextPrime:
-    for (var i = 2; i <= 256; i++) {
+    while (i <= copeOfBase);
+    decomposition.sort(compareNumbers);
+    var firstCal = calculate(decomposition, maxPower);
+    maxPower1 = firstCal[1];
 
-    for (var j = 2; j < i; j++) {
-        if (i % j == 0) continue nextPrime;
-    }
+    var multiDecomposition1 = decomposition[0];
+    decomposition.sort(compareNumbers2);
+    var secondCal = calculate(decomposition, maxPower);
+    maxPower2 = secondCal[1];
+    var multiDecomposition2 = decomposition[0];
+    var multiDecomposition;
 
-        p.push(i);
+    if (maxPower1 >= 5 && multiDecomposition2 <= 5) {
+        maxPower = maxPower1
+        multiDecomposition = multiDecomposition1;
+    } else {
+
+        maxPower = maxPower2;
+        multiDecomposition = multiDecomposition2;
+
     }
-    for(var i=0;i<p.length;i++){
-        if(base === p[i] )
-            {
-                while (number >= p[i]){
-                number = ~~(number / p[i]);
-                result = result + number;
+    while (number >= multiDecomposition) {
+
+        number = ~~(number / multiDecomposition);
+
+        result = result + number;;
+    }
+    result = ~~(result / maxPower);
+    return result;
+    // your implementation
+}
+
+function compareNumbers(a, b) {
+    return a - b;
+}
+
+function compareNumbers2(a, b) {
+    return b - a;
+}
+
+function calculate(decomposition, maxPower) {
+    var power = 1;
+    maxPower = 1;
+    for (let i = 0; i < decomposition.length - 1; i++) {
+        if (decomposition[i] == decomposition[i + 1]) {
+            power++;
+            if (power > maxPower)
+                maxPower = power;
         }
-                return result;
-            } 
+
+        if (decomposition[i] !== decomposition[i + 1]) {
+            maxPower = power;
+            i = decomposition.length;
+        }
     }
-    var max=1;
-    for(var i=0;i<a.length;i++){
-        for(var j=0;j<p.length;j++){
-            if(a[i] === p[j]){
-                if(a[i]>max){
-                    max = p[j];
-                }
-            }
-        }  
-    }
-    if(base == 9 || base == 16){
-        while (number >= 5){
-                number = ~~(number / 5);
-                result = result + number;
-    
-    }
-        return result;
-    }else if(base === 81){
-               while (number >= 9){
-                number = ~~(number / 9);
-                result = result + number;
-    
-    }
-        return result;
-            }  else {
-               while (number >= max){
-                number = ~~(number / max);
-                result = result + number;
-    
-    }
-        return result;
-              }   
-  // your implementation
+    return [decomposition, power, maxPower];
 }
